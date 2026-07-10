@@ -81,6 +81,23 @@ object TilingLattice:
 
   extension (tiling: TilingDCEL)
 
+    /** All translation-period candidates that pass the (tolerant) landing validation, sorted by norm and
+      * paired with their landing-mismatch fraction, together with the dominant-orbit anchor point. Unlike
+      * [[translationLattice]] — which commits to the two shortest independent vectors — this exposes the full
+      * validated list so a caller can select a basis by stronger structural criteria (e.g. cell-content
+      * equality, which is robust to the signature-rounding noise that breaks strict validation on large
+      * patches and to the sublattice false periods that tolerant validation admits). The mismatch fraction
+      * separates the two populations cheaply: ~0 for true periods (rounding flips only), near the defect
+      * budget for tolerated false periods. Each candidate carries `(vector, mismatches, landings)`.
+      */
+    private[dcel] def validatedPeriods(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Option[(BigPoint, List[(BigPoint, Int, Int)])] =
+      periodCandidates(minOverlapFraction, maxDefectFraction, anchorOnly = true).map((dominant, validated) =>
+        (dominant.head.coords, validated)
+      )
+
     /** The local star of a vertex: the sorted, rounded directions to its adjacent vertices. Invariant under
       * translation, so two vertices related by a lattice translation share a signature; mirror/rotation
       * images do not.
@@ -101,8 +118,11 @@ object TilingLattice:
       *   `(v, w)` the Lagrange–Gauss reduced primitive basis (sign-canonicalised), or `None` if no lattice is
       *   found
       */
-    def translationLattice(minOverlapFraction: Double = 0.25): Option[(BigPoint, BigPoint)] =
-      periodicData(minOverlapFraction).map((_, v, w) => (v, w))
+    def translationLattice(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Option[(BigPoint, BigPoint)] =
+      periodicData(minOverlapFraction, maxDefectFraction).map((_, v, w) => (v, w))
 
     /** The dominant translation orbit plus its reduced lattice basis — shared by [[translationLattice]] and
       * [[largestContainedParallelogon]].
@@ -111,7 +131,11 @@ object TilingLattice:
       *   a candidate period must map at least this fraction of dominant-orbit vertices onto interior
       *   vertices, ruling out large vectors with little/no genuine overlap.
       */
-    private def periodicData(minOverlapFraction: Double): Option[(List[Vertex], BigPoint, BigPoint)] =
+    private def periodCandidates(
+        minOverlapFraction: Double,
+        maxDefectFraction: Double,
+        anchorOnly: Boolean = false
+    ): Option[(List[Vertex], List[(BigPoint, Int, Int)])] =
       val interior                         = interiorVertices
       val sigAll: Map[VertexId, List[Key]] =
         interior.map(v => v.id -> signature(v)).toMap
@@ -130,26 +154,62 @@ object TilingLattice:
         val vertexAt: Map[Key, Vertex] =
           interior.map(v => key(v.coords) -> v).toMap
         val minMatches                 = math.max(3, (dominant.size * minOverlapFraction).toInt)
-        val maxDefects                 = math.max(2, dominant.size / 10)
+        // maxDefectFraction = 0 demands exact signature preservation on every landing: the right
+        // setting for weld-free patches (e.g. enumeration candidates), where a tolerance would let a
+        // sub-period of a dominant-orbit sublattice pass on the back of sparse minority-type
+        // mismatches. The default keeps the welded-defect tolerance this detector was built with.
+        val maxDefects                 =
+          if maxDefectFraction == 0.0 then 0
+          else math.max(2, (dominant.size * maxDefectFraction).toInt)
 
-        def isPeriod(t: BigPoint): Boolean =
-          val landings   = interior.flatMap(u => vertexAt.get(key(u.coords + t)).map(w => (u, w)))
-          val mismatches = landings.count((u, w) => sigAll(u.id) != sigAll(w.id))
-          landings.size >= minMatches && mismatches <= maxDefects
+        // anchorOnly trades the O(d^2) full difference set for the O(d) differences from a single
+        // well-placed anchor — the dominant vertex nearest the patch centroid, whose visible
+        // orbit-mates surround it in every direction. Enumeration certifiers call this on every
+        // horizon patch, where candidate generation dominates the certify cost; the anchor is moved
+        // to the head of the returned orbit so callers anchor their cell grids on it.
+        val anchored: List[Vertex] =
+          if anchorOnly then
+            val centroid = interior.map(_.coords).centroid
+            val anchor   = dominant.minBy(v => (v.coords - centroid).dot(v.coords - centroid))
+            anchor :: dominant.filterNot(_.id == anchor.id)
+          else dominant
 
         val candidates: List[BigPoint] =
-          (for a <- dominant; b <- dominant if a.id != b.id yield b.coords - a.coords)
+          val pairs =
+            if anchorOnly then anchored.tail.map(b => b.coords - anchored.head.coords)
+            else for a <- anchored; b <- anchored if a.id != b.id yield b.coords - a.coords
+          pairs
             .filterNot(t => t.almostEquals(BigPoint.origin))
             .groupBy(key).values.map(_.head).toList
 
-        val validated = candidates.filter(isPeriod).sortBy(v => v.dot(v))
+        // Each surviving candidate carries its landing statistics: a true period mismatches only on
+        // rounding flips (an absolute handful), a tolerated sublattice false period mismatches in
+        // proportion to the structure it breaks — callers that select a basis by content evidence
+        // rank and threshold on these.
+        val validated =
+          candidates
+            .flatMap: t =>
+              val landings   = interior.flatMap(u => vertexAt.get(key(u.coords + t)).map(w => (u, w)))
+              val mismatches = landings.count((u, w) => sigAll(u.id) != sigAll(w.id))
+              Option.when(landings.size >= minMatches && mismatches <= maxDefects)(
+                (t, mismatches, landings.size)
+              )
+            .sortBy((t, _, _) => t.dot(t))
+        Some((anchored, validated))
 
-        validated.headOption.flatMap { v =>
-          validated
+    private def periodicData(
+        minOverlapFraction: Double,
+        maxDefectFraction: Double
+    ): Option[(List[Vertex], BigPoint, BigPoint)] =
+      periodCandidates(minOverlapFraction, maxDefectFraction).flatMap { (dominant, validated) =>
+        val vectors = validated.map(_._1)
+        vectors.headOption.flatMap { v =>
+          vectors
             .find(u => v.cross(u).abs > BigDecimal(ACCURACY)) // shortest independent
             .map(w => gaussReduced(v, w))
             .map((a, b) => (dominant, canonicalSign(a), canonicalSign(b)))
         }
+      }
 
     /** Maximal block of complete lattice cells (shared by the area- and corner-returning methods).
       *
@@ -158,8 +218,8 @@ object TilingLattice:
       * boundary faces (e.g. welded triangles) leave their cells short of a full covolume, so they are
       * excluded.
       */
-    private def maximalBlock(minOverlapFraction: Double): Option[Block] =
-      periodicData(minOverlapFraction).flatMap { (dominant, v, w) =>
+    private def maximalBlock(minOverlapFraction: Double, maxDefectFraction: Double): Option[Block] =
+      periodicData(minOverlapFraction, maxDefectFraction).flatMap { (dominant, v, w) =>
         val det    = v.cross(w)
         val covol  = det.abs
         val origin = dominant.head.coords
@@ -188,22 +248,25 @@ object TilingLattice:
       * @return
       *   the block, or `None` if no lattice is found or no cell is complete
       */
-    private[dcel] def largestContainedParallelogonBlock(minOverlapFraction: Double =
-      0.25): Option[ParallelogonBlock] =
-      maximalBlock(minOverlapFraction).map { case Block(v, w, origin, (i0, j0, width, height), _) =>
-        def corner(i: Int, j: Int): BigPoint =
-          origin + scaled(v, BigDecimal(i)) + scaled(w, BigDecimal(j))
-        ParallelogonBlock(
-          corners = List(
-            corner(i0, j0),
-            corner(i0 + width, j0),
-            corner(i0 + width, j0 + height),
-            corner(i0, j0 + height)
-          ),
-          cellsWide = width,
-          cellsHigh = height,
-          area = v.cross(w).abs * width * height
-        )
+    private[dcel] def largestContainedParallelogonBlock(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Option[ParallelogonBlock] =
+      maximalBlock(minOverlapFraction, maxDefectFraction).map {
+        case Block(v, w, origin, (i0, j0, width, height), _) =>
+          def corner(i: Int, j: Int): BigPoint =
+            origin + scaled(v, BigDecimal(i)) + scaled(w, BigDecimal(j))
+          ParallelogonBlock(
+            corners = List(
+              corner(i0, j0),
+              corner(i0 + width, j0),
+              corner(i0 + width, j0 + height),
+              corner(i0, j0 + height)
+            ),
+            cellsWide = width,
+            cellsHigh = height,
+            area = v.cross(w).abs * width * height
+          )
       }
 
     /** The largest parallelogon contained in the patch (ADR-0015), as its ordered corner vertices (4 or 6) —
@@ -222,8 +285,11 @@ object TilingLattice:
       * @return
       *   the corner vertices, or `None` if the patch is neither a parallelogon nor contains one
       */
-    def largestContainedParallelogon(minOverlapFraction: Double = 0.25): Option[List[Vertex]] =
-      wholeBoundaryCorners.orElse(latticeParallelogonCorners(minOverlapFraction))
+    def largestContainedParallelogon(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Option[List[Vertex]] =
+      wholeBoundaryCorners.orElse(latticeParallelogonCorners(minOverlapFraction, maxDefectFraction))
 
     /** Whole-boundary fast path: if the patch boundary itself is a parallelogon, its corner vertices are the
       * answer (the whole patch is the largest contained parallelogon).
@@ -238,32 +304,36 @@ object TilingLattice:
       * `parallelogonIndices`. The block interior angle at each boundary vertex is the sum of the incident
       * block-face corner angles there.
       */
-    private def latticeParallelogonCorners(minOverlapFraction: Double): Option[List[Vertex]] =
-      maximalBlock(minOverlapFraction).flatMap { case Block(_, _, _, (i0, j0, width, height), facesByCell) =>
-        val blockCells: Set[(Int, Int)] =
-          (for i <- i0 until i0 + width; j <- j0 until j0 + height yield (i, j)).toSet
-        val blockFaces: Set[Face]       =
-          blockCells.flatMap(facesByCell.getOrElse(_, Nil))
-        val blockEdges: List[HalfEdge]  =
-          blockFaces.toList.flatMap(_.halfEdgesUnsafe)
+    private def latticeParallelogonCorners(
+        minOverlapFraction: Double,
+        maxDefectFraction: Double
+    ): Option[List[Vertex]] =
+      maximalBlock(minOverlapFraction, maxDefectFraction).flatMap {
+        case Block(_, _, _, (i0, j0, width, height), facesByCell) =>
+          val blockCells: Set[(Int, Int)] =
+            (for i <- i0 until i0 + width; j <- j0 until j0 + height yield (i, j)).toSet
+          val blockFaces: Set[Face]       =
+            blockCells.flatMap(facesByCell.getOrElse(_, Nil))
+          val blockEdges: List[HalfEdge]  =
+            blockFaces.toList.flatMap(_.halfEdgesUnsafe)
 
-        // boundary = block-face half-edges whose twin lies outside the block (a non-block face, or the outer)
-        val boundary: List[HalfEdge] =
-          blockEdges.filter(he => !he.twin.flatMap(_.incidentFace).exists(blockFaces.contains))
-        val ordered                  = orderCycle(boundary)
+          // boundary = block-face half-edges whose twin lies outside the block (a non-block face, or the outer)
+          val boundary: List[HalfEdge] =
+            blockEdges.filter(he => !he.twin.flatMap(_.incidentFace).exists(blockFaces.contains))
+          val ordered                  = orderCycle(boundary)
 
-        if ordered.size < 4 || ordered.size != boundary.size then None
-        else
-          // block interior angle at each boundary vertex = Σ corner angles of block faces meeting there
-          val angleAt: Map[VertexId, AngleDegree] =
-            blockEdges
-              .groupBy(_.origin.id)
-              .map((vertexId, hes) => vertexId -> hes.flatMap(_.angle).foldLeft(AngleDegree(0))(_ + _))
-          val cycleVertices                       = ordered.map(_.origin)
-          val polygon                             = SimplePolygon(ordered.map(he => angleAt(he.origin.id)).toVector)
-          polygon.parallelogonIndices match
-            case Nil     => None
-            case indices => Some(canonicalCorners(indices.map(cycleVertices)))
+          if ordered.size < 4 || ordered.size != boundary.size then None
+          else
+            // block interior angle at each boundary vertex = Σ corner angles of block faces meeting there
+            val angleAt: Map[VertexId, AngleDegree] =
+              blockEdges
+                .groupBy(_.origin.id)
+                .map((vertexId, hes) => vertexId -> hes.flatMap(_.angle).foldLeft(AngleDegree(0))(_ + _))
+            val cycleVertices                       = ordered.map(_.origin)
+            val polygon                             = SimplePolygon(ordered.map(he => angleAt(he.origin.id)).toVector)
+            polygon.parallelogonIndices match
+              case Nil     => None
+              case indices => Some(canonicalCorners(indices.map(cycleVertices)))
       }
 
   /** Flip a vector to a canonical half-plane so the basis is deterministic. */
@@ -271,10 +341,10 @@ object TilingLattice:
     val positive = v.x > BigDecimal(ACCURACY) || (v.x.abs <= BigDecimal(ACCURACY) && v.y > 0)
     if positive then v else BigPoint.origin - v
 
-  private def scaled(p: BigPoint, k: BigDecimal): BigPoint =
+  private[dcel] def scaled(p: BigPoint, k: BigDecimal): BigPoint =
     BigPoint(p.x * k, p.y * k)
 
-  private def floorToInt(x: BigDecimal): Int =
+  private[dcel] def floorToInt(x: BigDecimal): Int =
     x.setScale(0, BigDecimal.RoundingMode.FLOOR).toInt
 
   /** Chains boundary half-edges into a single cycle by matching each one's destination to the next one's
@@ -309,7 +379,7 @@ object TilingLattice:
     * cell. Classic histogram sweep: for each row, grow per-column run-heights and take the largest rectangle
     * in that histogram, tracking the winning position. O(rows · cols).
     */
-  private def maximalRectangle(occupied: Set[(Int, Int)]): Option[(Int, Int, Int, Int)] =
+  private[dcel] def maximalRectangle(occupied: Set[(Int, Int)]): Option[(Int, Int, Int, Int)] =
     if occupied.isEmpty then None
     else
       val minI    = occupied.iterator.map(_._1).min
@@ -346,7 +416,7 @@ object TilingLattice:
     * (minimal) basis — the two successive minima — which in 2D is guaranteed to be a basis of the same
     * lattice.
     */
-  private def gaussReduced(v0: BigPoint, w0: BigPoint): (BigPoint, BigPoint) =
+  private[dcel] def gaussReduced(v0: BigPoint, w0: BigPoint): (BigPoint, BigPoint) =
     var a        = v0
     var b        = w0
     if a.dot(a) > b.dot(b) then

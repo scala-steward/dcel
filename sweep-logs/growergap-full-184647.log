@@ -1,0 +1,45 @@
+GrowerGapDiagnosisProbe: oracle maxSize=24, grower maxFaces=96, 3min/set
+  oracle n=3: 39 tilings across 26 type-sets
+  3.12.12; 3.3.4.12; 3.4.3.12                          oracle=1 grower=1
+  3.12.12; 3.3.4.12; 3.4.6.4                           oracle=1 grower=1
+  3.12.12; 3.4.3.12; 3.4.6.4                           oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.3.3.6; 3.3.6.6                      oracle=3 grower=2  GAP 1
+     MISSED D=24 t=5 v=3 e=8 ori=false mir=true cone-tile=[] cone-vert=[]  hasRot=true
+  3.3.3.3.3.3; 3.3.3.3.6; 3.6.3.6                      oracle=3 grower=3
+  3.3.3.3.3.3; 3.3.3.4.4; 3.3.4.12                     oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.3.4.4; 3.3.4.3.4                    oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.3.4.4; 3.4.6.4                      oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.3.4.4; 4.4.4.4                      oracle=4 grower=1  GAP 3
+     MISSED D=13 t=4 v=3 e=6 ori=false mir=true cone-tile=[] cone-vert=[2]  hasRot=true
+     MISSED D=15 t=5 v=3 e=7 ori=false mir=true cone-tile=[2] cone-vert=[]  hasRot=true
+     MISSED D=12 t=4 v=3 e=6 ori=false mir=true cone-tile=[2] cone-vert=[2]  hasRot=true
+  3.3.3.3.3.3; 3.3.4.12; 3.3.4.3.4                     oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.4.12; 4.6.12                        oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.4.3.4; 3.4.4.6                      oracle=1 grower=1
+  3.3.3.3.3.3; 3.3.4.3.4; 3.4.6.4                      oracle=2 grower=2
+  3.3.3.3.3.3; 3.3.6.6; 6.6.6                          oracle=1 grower=1
+  3.3.3.3.6; 3.3.3.4.4; 3.3.4.3.4                      oracle=1 grower=1
+  3.3.3.3.6; 3.3.3.4.4; 3.4.4.6                        oracle=1 grower=1
+  3.3.3.3.6; 3.3.6.6; 6.6.6                            oracle=1 grower=1
+  3.3.3.4.4; 3.3.4.12; 3.4.6.4                         oracle=1 grower=1
+  3.3.3.4.4; 3.3.4.3.4; 4.4.4.4                        oracle=1 grower=1
+  3.3.3.4.4; 3.3.6.6; 3.4.4.6                          oracle=1 grower=1
+  3.3.4.3.4; 3.4.4.6; 3.4.6.4                          oracle=1 grower=1
+  3.3.6.6; 3.4.4.6; 3.6.3.6                            oracle=2 grower=2
+  3.3.6.6; 3.6.3.6; 6.6.6                              oracle=2 grower=1  GAP 1
+     MISSED D=11 t=4 v=3 e=5 ori=false mir=true cone-tile=[3,6] cone-vert=[]  hasRot=true
+  3.4.4.6; 3.4.6.4; 4.4.4.4                            oracle=1 grower=1
+  3.4.4.6; 3.6.3.6; 4.4.4.4                            oracle=4 grower=2  GAP 2
+     MISSED D=18 t=6 v=3 e=7 ori=false mir=true cone-tile=[2,2,2] cone-vert=[2]  hasRot=true
+     MISSED D=18 t=5 v=3 e=7 ori=false mir=true cone-tile=[2] cone-vert=[2]  hasRot=true
+  3.4.4.6; 3.6.3.6; 4.6.12                             oracle=1 grower=1
+=== GROWER n=3 vs corrected oracle: reached 32 / 39 ===
+true gaps (7):
+  3.3.3.3.3.3; 3.3.3.3.6; 3.3.6.6 —     MISSED D=24 t=5 v=3 e=8 ori=false mir=true cone-tile=[] cone-vert=[]  hasRot=true
+  3.3.3.3.3.3; 3.3.3.4.4; 4.4.4.4 —     MISSED D=13 t=4 v=3 e=6 ori=false mir=true cone-tile=[] cone-vert=[2]  hasRot=true
+  3.3.3.3.3.3; 3.3.3.4.4; 4.4.4.4 —     MISSED D=15 t=5 v=3 e=7 ori=false mir=true cone-tile=[2] cone-vert=[]  hasRot=true
+  3.3.3.3.3.3; 3.3.3.4.4; 4.4.4.4 —     MISSED D=12 t=4 v=3 e=6 ori=false mir=true cone-tile=[2] cone-vert=[2]  hasRot=true
+  3.3.6.6; 3.6.3.6; 6.6.6 —     MISSED D=11 t=4 v=3 e=5 ori=false mir=true cone-tile=[3,6] cone-vert=[]  hasRot=true
+  3.4.4.6; 3.6.3.6; 4.4.4.4 —     MISSED D=18 t=6 v=3 e=7 ori=false mir=true cone-tile=[2,2,2] cone-vert=[2]  hasRot=true
+  3.4.4.6; 3.6.3.6; 4.4.4.4 —     MISSED D=18 t=5 v=3 e=7 ori=false mir=true cone-tile=[2] cone-vert=[2]  hasRot=true
+[done]

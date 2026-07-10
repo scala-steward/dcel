@@ -1,0 +1,31 @@
+############### set1 maxFaces=220 ###############
+DeepReachProbe: maxFaces=220 perSet=10min — 1 n=3 deficit set(s)
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   10s] states=1614     (161/s)  frontier~0  faces~190/max216 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   20s] states=2377     (118/s)  frontier~0  faces~207/max221 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   30s] states=2552     (85/s)  frontier~0  faces~221/max221 tilings=6
+>>> 3.3.6.6; 3.4.4.6; 3.6.3.6                reached=2/3  [STILL SHORT (was 2/3 @96)]  31s
+############### set1 maxFaces=300 ###############
+DeepReachProbe: maxFaces=300 perSet=10min — 1 n=3 deficit set(s)
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   10s] states=1642     (164/s)  frontier~2  faces~196/max218 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   20s] states=2502     (124/s)  frontier~0  faces~183/max300 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   30s] states=3146     (104/s)  frontier~0  faces~290/max301 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   40s] states=3459     (86/s)  frontier~0  faces~183/max301 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   50s] states=3725     (74/s)  frontier~0  faces~274/max301 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   60s] states=3776     (62/s)  frontier~0  faces~296/max301 tilings=6
+>>> 3.3.6.6; 3.4.4.6; 3.6.3.6                reached=2/3  [STILL SHORT (was 2/3 @96)]  61s
+############### set1 maxFaces=380 ###############
+DeepReachProbe: maxFaces=380 perSet=10min — 1 n=3 deficit set(s)
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   10s] states=1674     (167/s)  frontier~0  faces~218/max224 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   20s] states=2514     (125/s)  frontier~0  faces~264/max324 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   30s] states=3153     (105/s)  frontier~0  faces~376/max380 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   40s] states=3689     (92/s)  frontier~0  faces~253/max380 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   50s] states=4122     (82/s)  frontier~0  faces~283/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   60s] states=4434     (73/s)  frontier~0  faces~277/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   70s] states=4761     (67/s)  frontier~0  faces~333/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   80s] states=4913     (61/s)  frontier~0  faces~381/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [   90s] states=5012     (55/s)  frontier~0  faces~349/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [  100s] states=5050     (50/s)  frontier~0  faces~381/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [  110s] states=5052     (45/s)  frontier~0  faces~372/max381 tilings=6
+    3.3.6.6; 3.4.4.6; 3.6.3.6                  [  120s] states=5114     (42/s)  frontier~0  faces~334/max381 tilings=6
+>>> 3.3.6.6; 3.4.4.6; 3.6.3.6                reached=2/3  [STILL SHORT (was 2/3 @96)]  123s
+LADDER DONE

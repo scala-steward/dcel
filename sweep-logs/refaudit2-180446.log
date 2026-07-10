@@ -1,0 +1,7 @@
+=== n=1 : ORACLE total 11, REFERENCE total 11 (A068600=11) ===
+  ✓ oracle and reference agree on every type-set
+=== n=2 : ORACLE total 20, REFERENCE total 20 (A068600=20) ===
+  ✓ oracle and reference agree on every type-set
+=== n=3 : ORACLE total 39, REFERENCE total 39 (A068600=39) ===
+  ✓ oracle and reference agree on every type-set
+=== AUDIT SUMMARY: 0 total discrepancy(ies) across n≤3 ===

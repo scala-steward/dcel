@@ -1,0 +1,22 @@
+ClosureDirectedProbe: maxN=3 maxFaces=120 minutesEach=5 par=12 maxStates=2000000
+  CONSTRAINED to target: 3.3.3.3.3.3
+
+--- DFS driver (symmetryRotationReferenceParallel) ---
+=== DFS: 0s  total=1 ===
+   n=1:  1/11
+   n=2:  0/20
+   n=3:  0/39
+
+--- BEST-FIRST driver (symmetryClosureDirectedParallel) ---
+=== BEST-FIRST: 0s  total=1 ===
+   n=1:  1/11
+   n=2:  0/20
+   n=3:  0/39
+
+=== HEAD-TO-HEAD ===
+   n=1: DFS  1   best-first  1   (of 11)
+   n=2: DFS  0   best-first  0   (of 20)
+   n=3: DFS  0   best-first  0   (of 39)
+   keys only in best-first: 0
+   keys only in DFS:        0
+[done]

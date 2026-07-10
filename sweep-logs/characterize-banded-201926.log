@@ -1,0 +1,11 @@
+CharacterizeBandedProbe: oracle=24 grower maxFaces=96 boundedV maxV=12 90s/set
+  n=3: 39 tilings, 26 type-sets
+=== n=3 characterization (39 cells) ===
+max cone order: C2=20 C3=1 C4=2 C6=16
+banded: yes=17 no=5 unrealized=17
+  GROWER reached 32, MISSED 7
+  of MISSED: C2=6 higher=1 | banded=6 not=0 ?=1
+  of REACHED: C2=14 higher=18 | banded=11 not=5 ?=16
+  BANDED family size: 17; of them grower MISSED 6 (35%), reached 11
+  NON-banded (realized): 5; grower MISSED 0, reached 5
+[done]

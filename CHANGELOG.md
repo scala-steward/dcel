@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`TilingLattice.validatedPeriods`** (package-private) and a `maxDefectFraction` parameter on
+  `translationLattice`: period detection now exposes the full validated candidate list with per-candidate
+  landing-mismatch fractions, so callers can select a basis by stronger structural criteria than
+  shortest-vector; the tolerance that was previously hardcoded (10%) is now a parameter with the same
+  default. Born from the A068600 research campaign (see `adr/0018`).
+
+### Removed
+
+- **The experimental `generator/` subproject.** The n-uniform enumeration research it hosted concluded and
+  moved to the sibling library [`uniform-tilings`](https://github.com/scala-tessella/uniform-tilings),
+  which supersedes it entirely (complete A068600 = 11, 20, 39, 33, 15, 10, 7 with the n = 8 ceiling, plus
+  the m-Archimedean table through row 8 and the (8,2) = 258 correction to the published record). The full
+  research history is preserved at the `a068600-research-archive` tag.
+
 ## [0.2.1] — 2026-06-12
 
 ### Fixed

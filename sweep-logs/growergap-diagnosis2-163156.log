@@ -1,0 +1,13 @@
+GrowerGapDiagnosisProbe: oracle maxSize=26, grower maxFaces=96, 4min/set
+  oracle distinct n≤3 tilings: 70 (n=3: 39)
+=== 3.3.6.6; 3.4.4.6; 3.6.3.6 : ORACLE=2  REFERENCE=3  ⚠ ORACLE≠REFERENCE (likely TilingReference transcription error)  grower reached 2 ===
+  [  reached] D=16 t=5 v=3 e=7 ori=false mir=true cone-tile=[2,2] cone-vert=[]  hasRot=true
+  [  reached] D=16 t=4 v=3 e=7 ori=false mir=true cone-tile=[] cone-vert=[]  hasRot=true
+=== 3.3.6.6; 3.6.3.6; 6.6.6 : ORACLE=2  REFERENCE=2  grower reached 1 ===
+  [MISSED  <—] D=11 t=4 v=3 e=5 ori=false mir=true cone-tile=[3,6] cone-vert=[]  hasRot=true
+  [  reached] D=9 t=2 v=3 e=4 ori=false mir=true cone-tile=[] cone-vert=[2]  hasRot=true
+=== 3.3.3.3.3.3; 3.3.3.3.6; 3.3.6.6 : ORACLE=3  REFERENCE=3  grower reached 2 ===
+  [  reached] D=12 t=3 v=3 e=5 ori=false mir=true cone-tile=[2] cone-vert=[2]  hasRot=true
+  [  reached] D=15 t=3 v=3 e=6 ori=false mir=true cone-tile=[2] cone-vert=[]  hasRot=true
+  [MISSED  <—] D=24 t=5 v=3 e=8 ori=false mir=true cone-tile=[] cone-vert=[]  hasRot=true
+[done]

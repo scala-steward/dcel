@@ -1,0 +1,84 @@
+ClosureDirectedProbe: maxN=3 maxFaces=96 minutesEach=5 par=12 maxStates=2000000
+
+--- DFS driver (symmetryRotationReferenceParallel) ---
+  [   10s] states=3011     (300/s)  frontier~34  faces~51/max97 tilings=21
+  [   20s] states=7426     (371/s)  frontier~14  faces~33/max97 tilings=29
+  [   30s] states=9627     (320/s)  frontier~58  faces~49/max97 tilings=31
+  [   40s] states=13040    (325/s)  frontier~27  faces~45/max97 tilings=35
+  [   50s] states=17411    (348/s)  frontier~33  faces~58/max97 tilings=35
+  [   60s] states=22350    (372/s)  frontier~22  faces~92/max97 tilings=35
+  [   70s] states=24700    (352/s)  frontier~32  faces~88/max97 tilings=39
+  [   80s] states=26920    (336/s)  frontier~35  faces~65/max97 tilings=40
+  [   90s] states=29857    (331/s)  frontier~20  faces~84/max97 tilings=41
+  [  100s] states=32214    (322/s)  frontier~36  faces~97/max97 tilings=42
+  [  110s] states=35073    (318/s)  frontier~37  faces~90/max97 tilings=42
+  [  120s] states=38187    (318/s)  frontier~5  faces~81/max97 tilings=43
+  [  130s] states=42785    (329/s)  frontier~45  faces~91/max97 tilings=44
+  [  140s] states=48970    (349/s)  frontier~36  faces~78/max97 tilings=44
+  [  150s] states=54641    (364/s)  frontier~31  faces~92/max97 tilings=44
+  [  160s] states=59367    (370/s)  frontier~17  faces~80/max97 tilings=44
+  [  170s] states=63950    (376/s)  frontier~46  faces~86/max97 tilings=48
+  [  180s] states=68212    (378/s)  frontier~25  faces~87/max97 tilings=48
+  [  190s] states=70648    (371/s)  frontier~49  faces~92/max97 tilings=48
+  [  200s] states=73162    (365/s)  frontier~27  faces~62/max97 tilings=48
+  [  210s] states=75264    (358/s)  frontier~25  faces~94/max97 tilings=48
+  [  220s] states=77362    (351/s)  frontier~38  faces~90/max97 tilings=48
+  [  230s] states=79859    (347/s)  frontier~56  faces~94/max97 tilings=48
+  [  240s] states=82563    (343/s)  frontier~12  faces~84/max97 tilings=48
+  [  250s] states=86544    (346/s)  frontier~45  faces~84/max97 tilings=48
+  [  260s] states=89926    (345/s)  frontier~32  faces~95/max97 tilings=49
+  [  270s] states=91656    (339/s)  frontier~41  faces~95/max97 tilings=49
+  [  280s] states=94014    (335/s)  frontier~20  faces~93/max97 tilings=50
+  [  290s] states=96341    (332/s)  frontier~26  faces~86/max97 tilings=51
+  [  300s] states=99008    (329/s)  frontier~13  faces~94/max97 tilings=51
+  [  310s] states=102764   (331/s)  frontier~0  faces~92/max97 tilings=52
+  [  320s] states=105507   (329/s)  frontier~0  faces~80/max97 tilings=53
+  [  330s] states=106208   (321/s)  frontier~0  faces~82/max97 tilings=53
+=== DFS: 330s  total=53 ===
+   n=1:  8/11
+   n=2: 15/20
+   n=3: 30/39
+
+--- BEST-FIRST driver (symmetryClosureDirectedParallel) ---
+  [   10s] states=1804     (180/s)  frontier~157  maxfaces=96 tilings=4
+  [   20s] states=3626     (181/s)  frontier~154  maxfaces=96 tilings=4
+  [   30s] states=6009     (200/s)  frontier~144  maxfaces=96 tilings=4
+  [   40s] states=8417     (210/s)  frontier~140  maxfaces=96 tilings=4
+  [   50s] states=10637    (212/s)  frontier~125  maxfaces=96 tilings=4
+  [   60s] states=12392    (206/s)  frontier~137  maxfaces=96 tilings=4
+  [   70s] states=15947    (227/s)  frontier~119  maxfaces=96 tilings=4
+  [   80s] states=19380    (242/s)  frontier~138  maxfaces=96 tilings=4
+  [   90s] states=22644    (251/s)  frontier~113  maxfaces=96 tilings=4
+  [  100s] states=25485    (254/s)  frontier~103  maxfaces=96 tilings=4
+  [  110s] states=27912    (253/s)  frontier~110  maxfaces=96 tilings=4
+  [  120s] states=29501    (245/s)  frontier~124  maxfaces=96 tilings=4
+  [  130s] states=32653    (251/s)  frontier~110  maxfaces=96 tilings=4
+  [  140s] states=35181    (251/s)  frontier~93  maxfaces=96 tilings=4
+  [  150s] states=38818    (258/s)  frontier~119  maxfaces=96 tilings=7
+  [  160s] states=41032    (256/s)  frontier~165  maxfaces=96 tilings=7
+  [  170s] states=43269    (254/s)  frontier~151  maxfaces=96 tilings=7
+  [  180s] states=45876    (254/s)  frontier~145  maxfaces=96 tilings=7
+  [  190s] states=48806    (256/s)  frontier~128  maxfaces=96 tilings=7
+  [  200s] states=51751    (258/s)  frontier~146  maxfaces=96 tilings=7
+  [  210s] states=55550    (264/s)  frontier~130  maxfaces=96 tilings=7
+  [  220s] states=58116    (264/s)  frontier~127  maxfaces=96 tilings=7
+  [  230s] states=61408    (266/s)  frontier~110  maxfaces=96 tilings=7
+  [  240s] states=64972    (270/s)  frontier~113  maxfaces=96 tilings=7
+  [  250s] states=67894    (271/s)  frontier~103  maxfaces=96 tilings=7
+  [  260s] states=69826    (268/s)  frontier~135  maxfaces=96 tilings=7
+  [  270s] states=71725    (265/s)  frontier~138  maxfaces=96 tilings=7
+  [  280s] states=74466    (265/s)  frontier~130  maxfaces=96 tilings=7
+  [  290s] states=77330    (266/s)  frontier~124  maxfaces=96 tilings=7
+  [  300s] states=80570    (268/s)  frontier~132  maxfaces=96 tilings=7
+=== BEST-FIRST: 303s  total=7 ===
+   n=1:  1/11
+   n=2:  2/20
+   n=3:  4/39
+
+=== HEAD-TO-HEAD ===
+   n=1: DFS  8   best-first  1   (of 11)  <== DFS ahead
+   n=2: DFS 15   best-first  2   (of 20)  <== DFS ahead
+   n=3: DFS 30   best-first  4   (of 39)  <== DFS ahead
+   keys only in best-first: 0
+   keys only in DFS:        46
+[done]

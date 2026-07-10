@@ -1,0 +1,7 @@
+GenProfileProbe: maxSize=24 maxN=4 parallelism=12
+  GEN (walk+canonicity+euclidean gate): 135.1s
+    complete D-sets = 260380   euclideanFeasible = 92164 (35.40%)
+  FULL (whole pipeline): 137.5s   raw symbols=87  distinct tilings=87
+  => GEN 135.1s (98%)   PROC 2.4s (2%)
+  VERDICT: the canonical GENERATION TREE dominates ⇒ attack checkCanonicity O(size²)/node.
+[done]

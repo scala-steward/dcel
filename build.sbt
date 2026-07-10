@@ -139,24 +139,6 @@ lazy val benchmarks = project
     )
   )
 
-// Experimental n-uniform / n-archimedean tiling generator.
-// Not part of the published artifact: the API and search heuristics are still
-// in flux (research-grade code with placeholder names, magic-number cutters,
-// and several disabled exploratory tests). Kept on main for iteration; run
-// tests via `sbt generator/test`. Not aggregated by root — its tests are slow.
-lazy val generator = project
-  .in(file("generator"))
-  .dependsOn(dcelJVM % "compile->compile;test->test")
-  .settings(
-    name           := "dcel-generator",
-    publish / skip := true,
-    libraryDependencies ++= Seq(
-      "org.scalatest"     %% "scalatest"       % "3.2.20"   % Test,
-      "org.scalacheck"    %% "scalacheck"      % "1.19.0"   % Test,
-      "org.scalatestplus" %% "scalacheck-1-19" % "3.2.20.0" % Test
-    )
-  )
-
 // Aggregate root project for IDE compatibility + Scaladoc site publication.
 // `sbt makeSite` packages the dcelJVM Scaladoc into target/site; the site.yml
 // workflow deploys it to GitHub Pages on every `v*` tag push.

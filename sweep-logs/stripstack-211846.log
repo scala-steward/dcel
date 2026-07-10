@@ -1,0 +1,11 @@
+StripStackProbe: enumerateBanded(n=3, covol=12.0, maxBandLen=4), oracle maxSize=24
+  oracle n=3: 39 tilings
+banded n=3 k=3 maxCovol=12.0 maxBandLen=4: 169/475 band-aligned lattices
+=== strip-stacking engine: 1 tilings in 1s (169 band lattices, 7370 states) ===
+  SOUND: 1 spurious (must be 0)   REACH: 0/39 of n=3
+  per gap-type-set (oracle vs strip-stacking):
+    3.3.3.3.3.3; 3.3.3.3.6; 3.3.6.6                    oracle=3 strip=0  <— GAP type-set
+    3.3.3.3.3.3; 3.3.3.4.4; 4.4.4.4                    oracle=4 strip=0  <— GAP type-set
+    3.3.6.6; 3.6.3.6; 6.6.6                            oracle=2 strip=0  <— GAP type-set
+    3.4.4.6; 3.6.3.6; 4.4.4.4                          oracle=4 strip=0  <— GAP type-set
+[done]

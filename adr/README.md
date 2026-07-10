@@ -37,6 +37,7 @@ decision. Each file has:
 | 0015 | [Largest parallelogon contained in a tiling](0015-largest-contained-parallelogon.md) | Accepted               |
 | 0016 | [Scala Native stays blocked on Spire — keep waiting, don't replace](0016-native-wait-for-spire.md) | Accepted               |
 | 0017 | [`Tiling` — the certified, validated tiling type](0017-validated-tiling.md) | Accepted               |
+| 0018 | [The A068600 research campaign (archive pointer)](0018-a068600-research-archive.md) | Accepted (campaign complete; continues in uniform-tilings) |
 
 ## When to add an ADR
 

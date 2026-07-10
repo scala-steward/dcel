@@ -1,0 +1,64 @@
+DischargeRProbe: PARALLEL generate-all enumerateSymbolsParallel(maxN=4, maxSize=26, parallelism=12) ...
+  [maxSize=26] 15s  dsets=36938 (2462/s)  distinct=19
+  [maxSize=26] 30s  dsets=67989 (2266/s)  distinct=19
+  [maxSize=26] 45s  dsets=103341 (2296/s)  distinct=25
+  [maxSize=26] 60s  dsets=119800 (1996/s)  distinct=29
+  [maxSize=26] 75s  dsets=136212 (1815/s)  distinct=30
+  [maxSize=26] 90s  dsets=155806 (1731/s)  distinct=33
+  [maxSize=26] 105s  dsets=167076 (1591/s)  distinct=33
+  [maxSize=26] 120s  dsets=174260 (1452/s)  distinct=33
+  [maxSize=26] 135s  dsets=196561 (1455/s)  distinct=33
+  [maxSize=26] 150s  dsets=209334 (1395/s)  distinct=36
+  [maxSize=26] 165s  dsets=227675 (1379/s)  distinct=38
+  [maxSize=26] 180s  dsets=246013 (1366/s)  distinct=41
+  [maxSize=26] 195s  dsets=265182 (1359/s)  distinct=50
+  [maxSize=26] 210s  dsets=283690 (1350/s)  distinct=50
+  [maxSize=26] 225s  dsets=299749 (1332/s)  distinct=50
+  [maxSize=26] 240s  dsets=315699 (1315/s)  distinct=51
+  [maxSize=26] 255s  dsets=328872 (1289/s)  distinct=53
+  [maxSize=26] 270s  dsets=348292 (1289/s)  distinct=54
+  [maxSize=26] 285s  dsets=363449 (1275/s)  distinct=54
+  [maxSize=26] 300s  dsets=373510 (1244/s)  distinct=54
+  [maxSize=26] 315s  dsets=382276 (1213/s)  distinct=54
+  [maxSize=26] 330s  dsets=389947 (1181/s)  distinct=54
+  [maxSize=26] 345s  dsets=400097 (1159/s)  distinct=57
+  [maxSize=26] 360s  dsets=406375 (1128/s)  distinct=57
+  [maxSize=26] 375s  dsets=416785 (1111/s)  distinct=57
+  [maxSize=26] 390s  dsets=422527 (1083/s)  distinct=57
+  [maxSize=26] 405s  dsets=426023 (1051/s)  distinct=57
+  [maxSize=26] 420s  dsets=430786 (1025/s)  distinct=57
+  [maxSize=26] 435s  dsets=433711 (996/s)  distinct=57
+  [maxSize=26] 450s  dsets=439462 (976/s)  distinct=57
+  [maxSize=26] 465s  dsets=454139 (976/s)  distinct=57
+  [maxSize=26] 480s  dsets=472114 (983/s)  distinct=60
+  [maxSize=26] 495s  dsets=483638 (977/s)  distinct=61
+  [maxSize=26] 510s  dsets=497105 (974/s)  distinct=61
+  [maxSize=26] 525s  dsets=512497 (976/s)  distinct=61
+  [maxSize=26] 540s  dsets=522803 (968/s)  distinct=64
+  [maxSize=26] 555s  dsets=534877 (963/s)  distinct=64
+  [maxSize=26] 570s  dsets=542897 (952/s)  distinct=66
+  [maxSize=26] 585s  dsets=553306 (945/s)  distinct=69
+  [maxSize=26] 600s  dsets=574356 (957/s)  distinct=70
+  [maxSize=26] 615s  dsets=592053 (962/s)  distinct=78
+  [maxSize=26] 630s  dsets=606063 (961/s)  distinct=79
+  [maxSize=26] 645s  dsets=616380 (955/s)  distinct=80
+  [maxSize=26] 660s  dsets=638419 (967/s)  distinct=84
+  [maxSize=26] 675s  dsets=654512 (969/s)  distinct=85
+  [maxSize=26] 690s  dsets=660142 (956/s)  distinct=85
+  [maxSize=26] 705s  dsets=664921 (943/s)  distinct=86
+  [maxSize=26] 720s  dsets=674956 (937/s)  distinct=89
+  [maxSize=26] 735s  dsets=678600 (923/s)  distinct=89
+  [maxSize=26] 750s  dsets=683445 (911/s)  distinct=89
+  [maxSize=26] 765s  dsets=685641 (896/s)  distinct=89
+  [maxSize=26] 780s  dsets=689576 (884/s)  distinct=90
+  (enumerated in 795s)
+  n=1: 11/11 tilings [COMPLETE ✓]   rotation-free: 0
+  n=2: 20/20 tilings [COMPLETE ✓]   rotation-free: 0
+  n=3: 39/39 tilings [COMPLETE ✓]   rotation-free: 0
+  n=4: 24/33 tilings [INCOMPLETE (need maxSize↑)]   rotation-free: 0
+
+  [method check] 8 tilings have a rotation ONLY via an edge-midpoint C₂ (no face/vertex cone)
+                 ⇒ the (0,2) edge term is load-bearing and hasRotation is discriminating, not vacuous.
+=== NOT (yet) discharged for n ≤ 4: a count is short (raise maxSize — generation wall) OR a rotation-free tiling was found (would be ⚠-flagged above). Reached counts are rotation-blind LOWER bounds.
+
+[done]
