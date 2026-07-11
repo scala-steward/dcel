@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-07-11
+
 ### Added
 
 - **`TilingLattice.validatedPeriods`** (package-private) and a `maxDefectFraction` parameter on
@@ -21,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which supersedes it entirely (complete A068600 = 11, 20, 39, 33, 15, 10, 7 with the n = 8 ceiling, plus
   the m-Archimedean table through row 8 and the (8,2) = 258 correction to the published record). The full
   research history is preserved at the `a068600-research-archive` tag.
+
+### Infrastructure
+
+- **Dependency refresh.** ring-seq 0.9.0, iron 3.3.2, sbt 1.12.13, Scala.js 1.22.0, sbt-scalafix 0.14.7,
+  sbt-ci-release 1.12.0, scalafmt 3.11.2. No API change.
 
 ## [0.2.1] — 2026-06-12
 

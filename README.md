@@ -2,7 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.scala-tessella/dcel_3.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.scala-tessella/dcel)
 [![Scala 3](https://img.shields.io/badge/scala-3.8.4-red.svg)](https://scala-lang.org)
-[![Scala.js](https://img.shields.io/badge/scala.js-1.21.0-blue.svg)](https://www.scala-js.org)
+[![Scala.js](https://img.shields.io/badge/scala.js-1.22.0-blue.svg)](https://www.scala-js.org)
 [![CI](https://github.com/scala-tessella/dcel/actions/workflows/ci.yml/badge.svg)](https://github.com/scala-tessella/dcel/actions/workflows/ci.yml)
 [![Scaladoc](https://img.shields.io/badge/docs-scaladoc-blue.svg)](https://scala-tessella.github.io/dcel/)
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-green.svg)](#license)
@@ -39,7 +39,7 @@ The Tessella web and desktop editor, see https://tessell.art/editor (open here t
 Add the dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "io.github.scala-tessella" %% "dcel" % "0.2.0"
+libraryDependencies += "io.github.scala-tessella" %% "dcel" % "0.2.2"
 // Use %%% instead of %% for Scala.js
 ```
 
@@ -85,15 +85,15 @@ ecosystem (see [ADR-0016](adr/0016-native-wait-for-spire.md)).
 
 ## Tech Stack
 
-| Item                                | Version / Status                              |
-|-------------------------------------|-----------------------------------------------|
-| Scala                               | 3.8.4                                         |
-| Published artifact                  | `"io.github.scala-tessella" %% "dcel" % "0.2.0"` (Maven Central) |
-| SBT                                 | 1.12.11                                       |
-| Platforms                           | JVM, Scala.js (CommonJS on Node.js)           |
-| Scala Native                        | scaffolded; blocked — no Spire artifact for Native 0.5 ([ADR-0016](adr/0016-native-wait-for-spire.md)) |
-| Core deps                           | [ring-seq](https://github.com/scala-tessella/ring-seq) `0.8.0`, [iron](https://github.com/Iltotore/iron) `3.3.1`, [spire](https://typelevel.org/spire) `0.18.0` |
-| Test deps                           | ScalaTest `3.2.20`, ScalaCheck `1.19.0`        |
+| Item                                | Version / Status                                                                                                                                                |
+|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Scala                               | 3.8.4                                                                                                                                                           |
+| Published artifact                  | `"io.github.scala-tessella" %% "dcel" % "0.2.2"` (Maven Central)                                                                                                |
+| SBT                                 | 1.12.13                                                                                                                                                         |
+| Platforms                           | JVM, Scala.js (CommonJS on Node.js)                                                                                                                             |
+| Scala Native                        | scaffolded; blocked — no Spire artifact for Native 0.5 ([ADR-0016](adr/0016-native-wait-for-spire.md))                                                          |
+| Core deps                           | [ring-seq](https://github.com/scala-tessella/ring-seq) `0.9.0`, [iron](https://github.com/Iltotore/iron) `3.3.2`, [spire](https://typelevel.org/spire) `0.18.0` |
+| Test deps                           | ScalaTest `3.2.20`, ScalaCheck `1.19.0`                                                                                                                         |
 
 ## Project Layout
 

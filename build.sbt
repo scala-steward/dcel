@@ -33,8 +33,8 @@ addCommandAlias("qa", ";scalafmtAll;test:scalafmtAll;scalafixAll;test")
 lazy val commonSettings = Seq(
 //  idePackagePrefix := Some("io.github.scala_tessella"),
   libraryDependencies ++= Seq(
-    "io.github.scala-tessella" %%% "ring-seq" % "0.8.0",
-    "io.github.iltotore" %%% "iron" % "3.3.1",
+    "io.github.scala-tessella" %%% "ring-seq" % "0.9.0",
+    "io.github.iltotore" %%% "iron" % "3.3.2",
     "org.typelevel" %%% "spire" % "0.18.0",
     "org.scalatest" %%% "scalatest" % "3.2.20" % Test,
     // ScalaCheck + ScalaTest integration for property-based tests (JVM & JS)
