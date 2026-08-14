@@ -2,6 +2,8 @@ package io.github.scala_tessella.dcel
 
 import io.github.scala_tessella.dcel.TilingDelaney.*
 import io.github.scala_tessella.dcel.conversion.TilingSVG
+import io.github.scala_tessella.dcel.geometry.RegularPolygon
+import io.github.scala_tessella.dcel.structure.VertexId
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -108,6 +110,50 @@ class TilingDelaneySpec extends AnyFlatSpec with Matchers with TilingTestHelpers
 
   it should "confirm the 6-uniform fixture" in:
     holedNet((i, j) => (i + 3 * j) % 13 == 0).exactUniformity.value shouldBe 6
+
+  behavior of "the 3.3.6.6.i fixture (old claim: uniformity 5)"
+
+  /** The `TilingUniformitySpec` construction: a hexagon net (all triangles of the holed net die) whose
+    * boundary notches are decorated with 6 rhombus wedges. Investigation (2026-08-14) showed the decoration
+    * is PARTIAL: the rhombi mark hexagons of the decoration lattice for subdivision into 6 unit triangles
+    * (the only way to complete a rhombus wedge inside a hexagonal gap), but only 6 of the ~10 lattice cells
+    * inside the patch are decorated, each with only 2 of its 6 forced triangles. The patch is therefore not a
+    * periodic sample of any tiling, and the pipeline says so.
+    */
+  private def partiallyDecorated: Tiling =
+    TilingBuilder.createHoledTriangleNet(9, 11)((i, j) => (i - j) % 3 == 0)
+      .value
+      .maybeAddRegularPolygon(VertexId(24), VertexId(25), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(25), VertexId(35), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(27), VertexId(28), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(28), VertexId(38), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(54), VertexId(55), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(55), VertexId(65), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(57), VertexId(58), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(58), VertexId(68), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(84), VertexId(85), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(85), VertexId(95), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(87), VertexId(88), RegularPolygon(3)).value
+      .maybeAddRegularPolygon(VertexId(88), VertexId(98), RegularPolygon(3)).value
+
+  it should "fail honestly: the partially decorated patch is not a periodic sample" in:
+    val error = partiallyDecorated.delaneyClassification().left.value
+    error shouldBe a[PeriodicityError]
+    error.message should include("360")
+
+  it should "classify the completed decoration as the 2-uniform tiling [3.3.3.3.3.3; 3.3.6.6]" in:
+    // the tiling the rhombus hints force: every decoration-lattice hexagon starred into 6 triangles,
+    // built directly by keeping the starred centres of the holed net
+    val result = TilingBuilder
+      .createHoledTriangleNet(12, 12)((i, j) => (i - j) % 3 == 0 && !(i % 3 == 0 && j % 3 == 0))
+      .value
+      .delaneyClassification()
+      .value
+    allAssert(
+      result.uniformity shouldBe 2,
+      result.gonality shouldBe 2,
+      result.vertexConfigs.sorted shouldBe List(List(3, 3, 3, 3, 3, 3), List(3, 3, 6, 6))
+    )
 
   behavior of "canonical keys"
 

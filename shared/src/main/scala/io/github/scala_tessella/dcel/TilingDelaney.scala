@@ -50,101 +50,111 @@ object TilingDelaney:
       else
         tiling.translationLattice(minOverlapFraction, maxDefectFraction) match
           case None         => Left("No translation lattice detected: the patch is not recognisably periodic")
-          case Some((v, w)) =>
-            val det    = v.cross(w)
-            val anchor = tiling.vertices.head.coords
+          case Some((v, w)) => tiling.torusChamberMapWithBasis(v, w)
 
-            def rounded(x: BigDecimal): BigDecimal =
-              x.setScale(SCALE, BigDecimal.RoundingMode.HALF_UP)
+    /** [[torusChamberMap]] with an explicitly supplied lattice basis — the quotient core, also usable to
+      * probe individual period candidates.
+      */
+    private[dcel] def torusChamberMapWithBasis(
+        v: BigPoint,
+        w: BigPoint
+    ): Either[String, Array[Array[Int]]] =
+      if tiling.vertices.isEmpty then Left("Empty tiling: nothing to quotient")
+      else
+        val det    = v.cross(w)
+        val anchor = tiling.vertices.head.coords
 
-            def fractional(x: BigDecimal): BigDecimal =
-              val r = rounded(x - x.setScale(0, BigDecimal.RoundingMode.FLOOR))
-              if r == BigDecimal(1) then rounded(BigDecimal(0)) else r
+        def rounded(x: BigDecimal): BigDecimal =
+          x.setScale(SCALE, BigDecimal.RoundingMode.HALF_UP)
 
-            // position modulo the lattice, as rounded fractional lattice coordinates
-            def vertexKey(p: BigPoint): Rounded2 =
-              val d = p - anchor
-              (fractional((d.x * w.y - w.x * d.y) / det), fractional((v.x * d.y - d.x * v.y) / det))
+        def fractional(x: BigDecimal): BigDecimal =
+          val r = rounded(x - x.setScale(0, BigDecimal.RoundingMode.FLOOR))
+          if r == BigDecimal(1) then rounded(BigDecimal(0)) else r
 
-            def edgeKey(halfEdge: HalfEdge): QuotientEdgeKey =
-              val p = halfEdge.origin.coords
-              val q = halfEdge.destinationUnsafe.coords
-              (vertexKey(p), (rounded(q.x - p.x), rounded(q.y - p.y)))
+        // position modulo the lattice, as rounded fractional lattice coordinates
+        def vertexKey(p: BigPoint): Rounded2 =
+          val d = p - anchor
+          (fractional((d.x * w.y - w.x * d.y) / det), fractional((v.x * d.y - d.x * v.y) / det))
 
-            val innerHalfEdges: List[HalfEdge] = tiling.innerFaces.flatMap(_.halfEdgesUnsafe)
+        def edgeKey(halfEdge: HalfEdge): QuotientEdgeKey =
+          val p = halfEdge.origin.coords
+          val q = halfEdge.destinationUnsafe.coords
+          (vertexKey(p), (rounded(q.x - p.x), rounded(q.y - p.y)))
 
-            // one index per quotient edge, plus a representative's endpoints for the geometric twin lookup
-            val index          = mutable.LinkedHashMap.empty[QuotientEdgeKey, Int]
-            val representative = mutable.ArrayBuffer.empty[HalfEdge]
-            innerHalfEdges.foreach: halfEdge =>
-              val key = edgeKey(halfEdge)
-              if !index.contains(key) then
-                index(key) = index.size + 1
-                representative += halfEdge
+        val innerHalfEdges: List[HalfEdge] = tiling.innerFaces.flatMap(_.halfEdgesUnsafe)
 
-            val size   = index.size
-            val nextOf = Array.fill(size + 1)(0)
-            val prevOf = Array.fill(size + 1)(0)
-            val twinOf = Array.fill(size + 1)(0)
+        // one index per quotient edge, plus a representative's endpoints for the geometric twin lookup
+        val index          = mutable.LinkedHashMap.empty[QuotientEdgeKey, Int]
+        val representative = mutable.ArrayBuffer.empty[HalfEdge]
+        innerHalfEdges.foreach: halfEdge =>
+          val key = edgeKey(halfEdge)
+          if !index.contains(key) then
+            index(key) = index.size + 1
+            representative += halfEdge
 
-            def link(map: Array[Int], from: Int, to: Int): Option[String] =
-              if map(from) == 0 then { map(from) = to; None }
-              else if map(from) == to then None
-              else
-                Some(
-                  s"Inconsistent quotient: two representatives of the same edge class disagree " +
-                    s"(class $from maps to both ${map(from)} and $to) — the detected period is not genuine"
-                )
+        val size   = index.size
+        val nextOf = Array.fill(size + 1)(0)
+        val prevOf = Array.fill(size + 1)(0)
+        val twinOf = Array.fill(size + 1)(0)
 
-            val inconsistency: Option[String] =
-              innerHalfEdges.view
-                .flatMap: halfEdge =>
-                  val here  = index(edgeKey(halfEdge))
-                  val after = index(edgeKey(halfEdge.next.get))
-                  link(nextOf, here, after).orElse(link(prevOf, after, here))
-                .headOption
+        def link(map: Array[Int], from: Int, to: Int): Option[String] =
+          if map(from) == 0 then { map(from) = to; None }
+          else if map(from) == to then None
+          else
+            Some(
+              s"Inconsistent quotient: two representatives of the same edge class disagree " +
+                s"(class $from maps to both ${map(from)} and $to) — the detected period is not genuine"
+            )
 
-            inconsistency match
+        val inconsistency: Option[String] =
+          innerHalfEdges.view
+            .flatMap: halfEdge =>
+              val here  = index(edgeKey(halfEdge))
+              val after = index(edgeKey(halfEdge.next.get))
+              link(nextOf, here, after).orElse(link(prevOf, after, here))
+            .headOption
+
+        inconsistency match
+          case Some(error) => Left(error)
+          case None        =>
+            // the twin's class is purely geometric: same edge seen from the other endpoint
+            val missingTwin: Option[String] = (1 to size).view
+              .flatMap: idx =>
+                val rep     = representative(idx - 1)
+                val p       = rep.origin.coords
+                val q       = rep.destinationUnsafe.coords
+                val twinKey = (vertexKey(q), (rounded(p.x - q.x), rounded(p.y - q.y)))
+                index.get(twinKey) match
+                  case Some(twinIdx) => twinOf(idx) = twinIdx; None
+                  case None          =>
+                    Some(
+                      s"Quotient edge class $idx has no reversed counterpart: the patch does not " +
+                        "cover a full fundamental domain of the detected lattice"
+                    )
+              .headOption
+
+            missingTwin match
               case Some(error) => Left(error)
               case None        =>
-                // the twin's class is purely geometric: same edge seen from the other endpoint
-                val missingTwin: Option[String] = (1 to size).view
-                  .flatMap: idx =>
-                    val rep     = representative(idx - 1)
-                    val p       = rep.origin.coords
-                    val q       = rep.destinationUnsafe.coords
-                    val twinKey = (vertexKey(q), (rounded(p.x - q.x), rounded(p.y - q.y)))
-                    index.get(twinKey) match
-                      case Some(twinIdx) => twinOf(idx) = twinIdx; None
-                      case None          =>
-                        Some(
-                          s"Quotient edge class $idx has no reversed counterpart: the patch does not " +
-                            "cover a full fundamental domain of the detected lattice"
-                        )
-                  .headOption
-
-                missingTwin match
-                  case Some(error) => Left(error)
-                  case None        =>
-                    val incomplete = (1 to size).find(idx => nextOf(idx) == 0 || prevOf(idx) == 0)
-                    if incomplete.isDefined then
-                      Left(s"Quotient edge class ${incomplete.get} has no next/prev representative")
-                    else
-                      // chambers: 2h-1 = (edge h, origin flag), 2h = (edge h, destination flag)
-                      val op     = Array.ofDim[Int](2 * size + 1, 3)
-                      (1 to size).foreach: h =>
-                        val originChamber      = 2 * h - 1
-                        val destinationChamber = 2 * h
-                        op(originChamber)(0) = destinationChamber
-                        op(destinationChamber)(0) = originChamber
-                        op(originChamber)(1) = 2 * prevOf(h)
-                        op(destinationChamber)(1) = 2 * nextOf(h) - 1
-                        op(originChamber)(2) = 2 * twinOf(h)
-                        op(destinationChamber)(2) = 2 * twinOf(h) - 1
-                      val broken = (1 to 2 * size).find(c => (0 to 2).exists(i => op(op(c)(i))(i) != c))
-                      broken match
-                        case Some(c) => Left(s"Chamber map is not involutive at chamber $c")
-                        case None    => Right(op)
+                val incomplete = (1 to size).find(idx => nextOf(idx) == 0 || prevOf(idx) == 0)
+                if incomplete.isDefined then
+                  Left(s"Quotient edge class ${incomplete.get} has no next/prev representative")
+                else
+                  // chambers: 2h-1 = (edge h, origin flag), 2h = (edge h, destination flag)
+                  val op     = Array.ofDim[Int](2 * size + 1, 3)
+                  (1 to size).foreach: h =>
+                    val originChamber      = 2 * h - 1
+                    val destinationChamber = 2 * h
+                    op(originChamber)(0) = destinationChamber
+                    op(destinationChamber)(0) = originChamber
+                    op(originChamber)(1) = 2 * prevOf(h)
+                    op(destinationChamber)(1) = 2 * nextOf(h) - 1
+                    op(originChamber)(2) = 2 * twinOf(h)
+                    op(destinationChamber)(2) = 2 * twinOf(h) - 1
+                  val broken = (1 to 2 * size).find(c => (0 to 2).exists(i => op(op(c)(i))(i) != c))
+                  broken match
+                    case Some(c) => Left(s"Chamber map is not involutive at chamber $c")
+                    case None    => Right(op)
 
     /** The exact classification of the periodic tiling this patch samples, read off the minimal Delaney–Dress
       * symbol of its torus quotient: uniformity, gonality, vertex configurations, canonical key and orbifold
