@@ -39,7 +39,7 @@ The Tessella web and desktop editor, see https://tessell.art/editor (open here t
 Add the dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "io.github.scala-tessella" %% "dcel" % "0.2.2"
+libraryDependencies += "io.github.scala-tessella" %% "dcel" % "0.3.0"
 // Use %%% instead of %% for Scala.js
 ```
 
@@ -88,7 +88,7 @@ ecosystem (see [ADR-0016](adr/0016-native-wait-for-spire.md)).
 | Item                                | Version / Status                                                                                                                                                |
 |-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Scala                               | 3.8.4                                                                                                                                                           |
-| Published artifact                  | `"io.github.scala-tessella" %% "dcel" % "0.2.2"` (Maven Central)                                                                                                |
+| Published artifact                  | `"io.github.scala-tessella" %% "dcel" % "0.3.0"` (Maven Central)                                                                                                |
 | SBT                                 | 1.12.13                                                                                                                                                         |
 | Platforms                           | JVM, Scala.js (CommonJS on Node.js)                                                                                                                             |
 | Scala Native                        | scaffolded; blocked — no Spire artifact for Native 0.5 ([ADR-0016](adr/0016-native-wait-for-spire.md))                                                          |
