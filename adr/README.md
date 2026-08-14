@@ -39,6 +39,7 @@ decision. Each file has:
 | 0017 | [`Tiling` — the certified, validated tiling type](0017-validated-tiling.md) | Accepted               |
 | 0018 | [The A068600 research campaign (archive pointer)](0018-a068600-research-archive.md) | Accepted (campaign complete; continues in uniform-tilings) |
 | 0019 | [Exact uniformity via a ported Delaney–Dress symbol subset](0019-exact-uniformity-delaney-dress.md) | Accepted |
+| 0020 | [Patch symmetry orbits as the answer for non-periodic patches](0020-patch-symmetry-orbits.md) | Accepted |
 
 ## When to add an ADR
 

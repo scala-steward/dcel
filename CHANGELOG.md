@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-08-14
+
+### Added
+
+- **Patch symmetry orbits (ADR-0020).** New `TilingPatchSymmetry` API on `TilingDCEL`:
+  `patchSymmetryGroup` reports the isometry group of the finite patch as `Cn` or `Dn`, and
+  `patchVertexClasses` gives the orbit of every vertex under it. Two vertices share an orbit exactly when a
+  rigid motion mapping the patch onto itself carries one to the other — well posed for every patch, periodic
+  or not, so unlike `delaneyVertexClasses` it never fails and never leaves a vertex unclassified. Found
+  geometrically: every isometry of a bounded figure fixes its centroid, so the group is finite and pinned by
+  where it sends one outermost vertex. Note this is the patch as drawn, NOT the tiling it samples — a
+  1-uniform 6×6 triangle net has 16 patch orbits — so it is the fallback, never the preferred answer.
+
+### Changed
+
+- `SvgOptions.showUniformity` now falls back to `patchVertexClasses` instead of the deprecated heuristic
+  `uniformityTree` grouping when the patch is not recognisably periodic. The exact Delaney–Dress classes are
+  still preferred whenever they exist. This leaves `uniformityTree` with no non-deprecated caller in the
+  library.
+
 ## [0.3.0] — 2026-08-14
 
 ### Added
