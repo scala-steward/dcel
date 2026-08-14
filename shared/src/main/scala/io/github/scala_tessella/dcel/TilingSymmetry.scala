@@ -4,6 +4,11 @@ import io.github.scala_tessella.dcel.geometry.{BigLineSegment, BigPoint}
 import io.github.scala_tessella.dcel.structure.VertexId
 import io.github.scala_tessella.ring_seq.SymmetryOps.{AxisLocation, Edge as SymEdge, Vertex as SymVertex}
 
+/** Symmetries of the FINITE PATCH as a drawn shape: rotations and reflections of its outer boundary that the
+  * internal structure preserves. This is a property of the patch, not of the infinite tiling it samples — for
+  * the symmetry group of the tiling itself (orbifold, cone orders, mirrors) see
+  * [[TilingDelaney.delaneyClassification]]'s `orbifoldSignature`.
+  */
 object TilingSymmetry:
 
   /** A location on the boundary where a symmetry axis can pass through.

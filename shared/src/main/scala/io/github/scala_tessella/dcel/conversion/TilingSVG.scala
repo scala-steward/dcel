@@ -1,8 +1,11 @@
 package io.github.scala_tessella.dcel.conversion
 
+import io.github.scala_tessella.dcel.TilingDelaney.delaneyVertexClasses
 import io.github.scala_tessella.dcel.geometry.*
-import io.github.scala_tessella.dcel.structure.{HalfEdge, Vertex}
+import io.github.scala_tessella.dcel.structure.{HalfEdge, Vertex, VertexId}
 import io.github.scala_tessella.dcel.{Tiling, TilingDCEL, TilingError}
+
+import scala.annotation.nowarn
 import io.github.scala_tessella.dcel.conversion.SvgDsl.*
 import io.github.scala_tessella.dcel.conversion.SvgRendering.*
 
@@ -41,7 +44,9 @@ object TilingSVG:
     * @param faceIdsOnEdges
     *   When true, labels each face's id on its half-edges.
     * @param showUniformity
-    *   When true, colours faces by their uniformity-tree group (see [[TilingDCEL.uniformityTree]]).
+    *   When true, colours vertices by their transitivity class — exact Delaney–Dress classes
+    *   ([[io.github.scala_tessella.dcel.TilingDelaney.delaneyVertexClasses]]) when the patch is recognisably
+    *   periodic, else the heuristic [[TilingDCEL.uniformityTree]] grouping as a fallback.
     */
   case class SvgOptions(
       strokeWidth: Double = 1.0,
@@ -146,15 +151,21 @@ object TilingSVG:
         Some(polygonElem(points))
       case _                             => None
 
+  @nowarn("cat=deprecation") // the heuristic uniformityTree remains the fallback until its removal
   private def createVertexElements(tilingDCEL: TilingDCEL, config: SvgConfig): (Seq[String], Seq[String]) =
-    val classes  = if config.showUniformity then tilingDCEL.uniformityTree.flattenLeaves else Nil
-    val indexMap =
-      classes
-        .zipWithIndex
-        .flatMap: (ids, idx) =>
-          ids.map:
-            _ -> idx
-        .toMap
+    // exact classes when the patch is recognisably periodic (every vertex classified); otherwise fall
+    // back to the patch-relative heuristic grouping, which classifies only a subset of the interior
+    val indexMap: Map[VertexId, Int] =
+      if !config.showUniformity then Map.empty
+      else
+        tilingDCEL.delaneyVertexClasses().getOrElse(
+          tilingDCEL.uniformityTree.flattenLeaves
+            .zipWithIndex
+            .flatMap: (ids, idx) =>
+              ids.map:
+                _ -> idx
+            .toMap
+        )
 
     sortedVertices(tilingDCEL)
       .map: vertex =>

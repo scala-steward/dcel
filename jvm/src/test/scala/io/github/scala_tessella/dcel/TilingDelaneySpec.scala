@@ -109,7 +109,40 @@ class TilingDelaneySpec extends AnyFlatSpec with Matchers with TilingTestHelpers
     )
 
   it should "confirm the 6-uniform fixture" in:
-    holedNet((i, j) => (i + 3 * j) % 13 == 0).exactUniformity.value shouldBe 6
+    holedNet((i, j) => (i + 3 * j) % 13 == 0).exactUniformity().value shouldBe 6
+
+  behavior of "TilingDelaney vertex and face classes"
+
+  it should "assign every vertex of the square net to the single class" in:
+    val net     = TilingBuilder.createRhombusNet(6, 6).value
+    val classes = net.delaneyVertexClasses().value
+    allAssert(
+      classes.keySet shouldBe net.vertices.map(_.id).toSet,
+      classes.values.toSet shouldBe Set(0)
+    )
+
+  it should "assign the 3.6.3.6 fixture's vertices to one class and its faces to two" in:
+    val tiling        = TilingSVG.fromMetadata(loadFile("metadata/3.6.3.6_uniformity_issue.xml")).value
+    val vertexClasses = tiling.delaneyVertexClasses().value
+    val faceClasses   = tiling.delaneyFaceClasses().value
+    val sizeOf        = tiling.innerFaces.map(f => f.id -> f.getVerticesUnsafe.size).toMap
+    allAssert(
+      vertexClasses.keySet shouldBe tiling.vertices.map(_.id).toSet,
+      vertexClasses.values.toSet shouldBe Set(0),
+      faceClasses.keySet shouldBe tiling.innerFaces.map(_.id).toSet,
+      faceClasses.values.toSet shouldBe Set(0, 1),
+      // the two face classes are exactly the triangles and the hexagons
+      faceClasses.groupBy(_._2).values.map(_.keySet.map(sizeOf).toList.distinct).toSet shouldBe
+        Set(List(3), List(6))
+    )
+
+  it should "split the 2-uniform fixture's vertices into two classes" in:
+    val net     = holedNet((i, j) => i % 3 == 0 && j % 3 == 0)
+    val classes = net.delaneyVertexClasses().value
+    allAssert(
+      classes.keySet shouldBe net.vertices.map(_.id).toSet,
+      classes.values.toSet shouldBe Set(0, 1)
+    )
 
   behavior of "the 3.3.6.6.i fixture (old claim: uniformity 5)"
 

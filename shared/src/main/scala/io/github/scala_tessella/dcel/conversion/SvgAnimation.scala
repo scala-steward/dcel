@@ -8,6 +8,8 @@ import io.github.scala_tessella.dcel.conversion.SvgDsl.*
 import io.github.scala_tessella.dcel.conversion.SvgRendering.*
 import io.github.scala_tessella.dcel.conversion.TilingSVG.{toScalableVectorGraphics, SvgOptions}
 
+import scala.annotation.nowarn
+
 /** Animated SVG export for [[TilingDCEL]]: [[toUniformityAnimation]] walks through the refinement steps of
   * the uniformity tree as an SMIL-animated drawing. Static tiling SVG lives in [[TilingSVG]].
   */
@@ -26,6 +28,12 @@ object SvgAnimation:
       * @param pauseBetweenSteps
       *   Seconds of dwell between steps.
       */
+    @deprecated(
+      "Animates the refinement steps of the deprecated heuristic uniformityTree (ADR-0019); the exact " +
+        "classification has no refinement process to animate",
+      "0.3.0"
+    )
+    @nowarn("cat=deprecation")
     def toUniformityAnimation(
         strokeWidth: Double = 1.0,
         padding: Double = 20.0,

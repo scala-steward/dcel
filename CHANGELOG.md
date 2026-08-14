@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Exact uniformity via Delaney–Dress symbols.** New `TilingDelaney` API on `TilingDCEL`:
+  `delaneyClassification` (uniformity, gonality, vertex configurations, canonical key, orbifold signature),
+  `exactUniformity`, `delaneyVertexClasses` and `delaneyFaceClasses` (the transitivity class of every vertex
+  / inner face). The pipeline detects the translation lattice, quotients the patch into a closed torus map,
+  and reads all counts off the minimal Delaney–Dress symbol — exact and independent of patch size, where the
+  previous refinement heuristic was patch-relative and demonstrably wrong (the disabled 3.6.3.6 regression
+  now classifies correctly as uniformity 1). Backed by the new `delaney.DelaneySymbols` engine, a ported
+  subset of research-core's, usable standalone on any closed map (`closedMapSymbol`, `minimalSymbol`,
+  `canonicalKey`, `orbifoldSignature`, `classifyTorusMap`).
+- **`PeriodicityError`** in the `TilingError` ADT: a patch with no detectable lattice, a false period, or too
+  little coverage has no exact answer and says so.
+
+### Changed
+
+- `SvgOptions.showUniformity` colouring now uses the exact Delaney–Dress vertex classes when the patch is
+  recognisably periodic (classifying every vertex), falling back to the heuristic grouping otherwise.
+- `delaneyClassification` tries strict period validation before the tolerant setting: on a weld-free patch a
+  tolerantly-validated sublattice false period can reach the quotient and fail its guards where strict
+  validation finds the genuine period.
+
+### Deprecated
+
+- The heuristic uniformity/gonality surface, superseded by the exact API: `uniformityTree`,
+  `uniformityTreeUncompressed`, `scanUniformityTree`, `gonalitySampleInnerVertexIds`, `gonalityTrees`,
+  `gonalityTreesWithPolygons`, and `toUniformityAnimation`. Removal planned for the next breaking minor.
+
 ## [0.2.2] — 2026-07-11
 
 ### Added

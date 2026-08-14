@@ -8,6 +8,7 @@ import io.github.scala_tessella.dcel.structure.{Face, FaceId, HalfEdge, HalfEdge
 import io.github.scala_tessella.ring_seq.RingSeq.bracelet
 
 import scala.Ordering.Implicits.*
+import scala.annotation.nowarn
 import scala.util.control.TailCalls.{TailRec, done, tailcall}
 
 /** Uniformity and gonality analysis for tilings, exposed as extension methods on [[TilingDCEL]].
@@ -233,6 +234,11 @@ object TilingUniformity:
       *   equivalence class. The result begins at the root with all inner vertices and progressively divides
       *   them through recursion.
       */
+    @deprecated(
+      "Patch-relative heuristic with documented incorrect results (ADR-0019); use " +
+        "TilingDelaney.delaneyVertexClasses for the exact vertex classes",
+      "0.3.0"
+    )
     def uniformityTreeUncompressed(maxDistance: Option[Int] = None): Tree[List[VertexId]] =
       val boundaryVertexIds =
         tiling.boundaryVerticesUnsafe
@@ -299,6 +305,12 @@ object TilingUniformity:
     /** One representative inner-vertex id per gonality class (i.e. per equivalence class at distance 0). The
       * list size equals the gonality of the tiling.
       */
+    @deprecated(
+      "Heuristic sampling with hash-order-dependent representatives; use " +
+        "TilingDelaney.delaneyFaceClasses / delaneyClassification for the exact gonality data",
+      "0.3.0"
+    )
+    @nowarn("cat=deprecation")
     def gonalitySampleInnerVertexIds: List[VertexId] =
       uniformityTreeUncompressed(Option(0))
         .compress:
@@ -319,6 +331,7 @@ object TilingUniformity:
         .map: angleDegree =>
           RegularPolygon.fromInteriorAngle(angleDegree)
 
+    @nowarn("cat=deprecation")
     private[dcel] def gonalityUnsafe: List[List[RegularPolygon]] =
       gonalitySampleInnerVertexIds
         .map: vertexId =>
@@ -335,6 +348,12 @@ object TilingUniformity:
       *   A list of trees, where each tree corresponds to the vertex equivalency classes at increasing depths.
       *   The final tree represents the full uniformity tree for the given tiling structure.
       */
+    @deprecated(
+      "Animates the refinement steps of the deprecated heuristic; no exact replacement (the exact " +
+        "classification has no refinement process to scan)",
+      "0.3.0"
+    )
+    @nowarn("cat=deprecation")
     def scanUniformityTree: List[Tree[List[VertexId]]] =
       // Optimization: compute the full tree first to find the max required depth
       val fullTree = uniformityTreeUncompressed(None)

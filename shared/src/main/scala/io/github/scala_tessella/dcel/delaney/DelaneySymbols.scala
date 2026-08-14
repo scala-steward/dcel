@@ -14,7 +14,8 @@ import scala.collection.mutable
   * needs: build a symbol from a closed map, minimise it, and read orbits, keys and signatures off it.
   * Deviations from the source are limited to: `Frac` replaced by Spire's `Rational` (already a dcel
   * dependency), the `{3,4,6,8,12}` polygon-alphabet filter generalised to the exact 360° vertex-closure
-  * check, and `null`-sentinel micro-optimisations dropped.
+  * check, `null`-sentinel micro-optimisations dropped, and the minimal-symbol reduction additionally exposing
+  * the full-chamber → minimal-chamber class map ([[minimalSymbolWithMap]]).
   *
   * A 2D Delaney–Dress symbol is the barycentric subdivision of a tiling into **chambers** (vertex·edge·face
   * flags), quotiented by the symmetry group, carrying three involutions `σ₀, σ₁, σ₂` (cross the vertex / edge
@@ -203,16 +204,28 @@ object DelaneySymbols:
     * vertex orbits are the uniformity — independent of the chosen cell.
     */
   extension (ds: DSymbol)
-    def minimalSymbol: DSymbol =
-      var cur  = ds
-      var step = reduceOnce(cur)
-      while step.isDefined do { cur = step.get; step = reduceOnce(cur) }
-      cur
+    def minimalSymbol: DSymbol = ds.minimalSymbolWithMap._1
 
-  /** One quotient step: the finest m-constant op-congruence identifying chamber 1 with some `d0`, or `None`
-    * if the symbol is already minimal.
+    /** [[minimalSymbol]] plus the chamber class map: `map(d)` is the minimal-symbol chamber that original
+      * chamber `d` folds onto (index 0 unused). The map is what lets a caller carry per-chamber data — e.g.
+      * which vertex or face of a concrete map a chamber belongs to — down to the orbits of the minimal
+      * symbol.
+      */
+    def minimalSymbolWithMap: (DSymbol, Array[Int]) =
+      var cur  = ds
+      var map  = Array.tabulate(ds.size + 1)(identity)
+      var step = reduceOnce(cur)
+      while step.isDefined do
+        val (next, cls) = step.get
+        map = map.map(cls)
+        cur = next
+        step = reduceOnce(cur)
+      (cur, map)
+
+  /** One quotient step: the finest m-constant op-congruence identifying chamber 1 with some `d0` (with its
+    * chamber class map), or `None` if the symbol is already minimal.
     */
-  private def reduceOnce(ds: DSymbol): Option[DSymbol] =
+  private def reduceOnce(ds: DSymbol): Option[(DSymbol, Array[Int])] =
     val n  = ds.size
     var d0 = 2
     while d0 <= n do
@@ -249,10 +262,11 @@ object DelaneySymbols:
       d0 += 1
     None
 
-  /** Quotient `ds` by the class map `cls` (an m-constant op-congruence). v-values are recomputed so the
-    * polygon side-counts and vertex degrees (`m₀₁`, `m₁₂`) are preserved: `v_new = m_original / r_new`.
+  /** Quotient `ds` by the class map `cls` (an m-constant op-congruence), together with the chamber map
+    * `original chamber -> quotient chamber`. v-values are recomputed so the polygon side-counts and vertex
+    * degrees (`m₀₁`, `m₁₂`) are preserved: `v_new = m_original / r_new`.
     */
-  private def quotient(ds: DSymbol, cls: Array[Int]): DSymbol =
+  private def quotient(ds: DSymbol, cls: Array[Int]): (DSymbol, Array[Int]) =
     val n             = ds.size
     val label         = mutable.LinkedHashMap.empty[Int, Int] // class rep -> new 1-based label
     val repOf         = mutable.ArrayBuffer(0)                // new label -> a representative original chamber
@@ -276,7 +290,8 @@ object DelaneySymbols:
       val mOrig =
         if orb.i == 0 then ds.m(0, 1, repOf(orb.elements.head)) else ds.m(1, 2, repOf(orb.elements.head))
       mOrig / orb.r
-    new DSymbol(qds, orbs, index, vs)
+    val chamberMap    = Array.tabulate(n + 1)(d => if d == 0 then 0 else label(cls(d)))
+    (new DSymbol(qds, orbs, index, vs), chamberMap)
 
   /** A canonical key for a CLOSED symbol: the lexicographically minimal BFS-renumbered trace of the three
     * involutions plus `(m₀₁, m₁₂)` per chamber, over every start chamber. Two symbols are isomorphic iff
@@ -354,16 +369,25 @@ object DelaneySymbols:
     * every count is under the full symmetry group of the tiling, independent of the chosen cell.
     */
   def classifyTorusMap(op: Array[Array[Int]]): Either[String, DelaneyClassification] =
+    classifyTorusMapDetailed(op).map(_._1)
+
+  /** [[classifyTorusMap]] plus the data needed to carry per-chamber assignments to the minimal symbol's
+    * orbits: the minimal symbol itself and the chamber class map `full chamber -> minimal chamber` (see
+    * [[minimalSymbolWithMap]]).
+    */
+  def classifyTorusMapDetailed(
+      op: Array[Array[Int]]
+  ): Either[String, (DelaneyClassification, DSymbol, Array[Int])] =
     val full = closedMapSymbol(op)
     if !full.isEuclidean then Left("Symbol is not euclidean (curvature ≠ 0): not a torus quotient")
     else if completeVertexConfigs(full).isEmpty then
       Left("A vertex configuration does not close to exactly 360°")
     else
-      val minimal = full.minimalSymbol
+      val (minimal, chamberMap) = full.minimalSymbolWithMap
       completeVertexConfigs(minimal)
         .toRight("Minimal symbol lost vertex closure (internal error)")
         .map: configs =>
-          DelaneyClassification(
+          val classification = DelaneyClassification(
             uniformity = minimal.vertexOrbitCount,
             gonality = minimal.faceOrbitCount,
             vertexConfigs = configs,
@@ -371,3 +395,4 @@ object DelaneySymbols:
             orbifoldSignature = minimal.orbifoldSignature,
             chambers = minimal.size
           )
+          (classification, minimal, chamberMap)

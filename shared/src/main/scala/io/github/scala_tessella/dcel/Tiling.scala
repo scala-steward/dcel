@@ -5,6 +5,8 @@ import io.github.scala_tessella.dcel.TilingDeletion.*
 import io.github.scala_tessella.dcel.TilingEquivalency.deepCopy
 import io.github.scala_tessella.dcel.TilingMultiplication.*
 import io.github.scala_tessella.dcel.TilingUniformity.regularPolygonsUnsafeFrom
+
+import scala.annotation.nowarn
 import io.github.scala_tessella.dcel.Tree
 import io.github.scala_tessella.dcel.Tree.{Branch, Leaf}
 import io.github.scala_tessella.dcel.TilingValidation.validate
@@ -341,6 +343,12 @@ object Tiling:
       *   A list of trees where each tree represents a simplified slice of the original uniformity tree, with
       *   just one representative vertex id instead of the full list.
       */
+    @deprecated(
+      "Built on the deprecated heuristic uniformityTree (ADR-0019); use " +
+        "TilingDelaney.delaneyFaceClasses / delaneyClassification for the exact gonality data",
+      "0.3.0"
+    )
+    @nowarn("cat=deprecation")
     def gonalityTrees: List[Tree[VertexId]] =
       val adjusted = tiling.uniformityTree match
         case Leaf(Nil)         => Leaf(Nil)
@@ -363,6 +371,12 @@ object Tiling:
     /** Pairs each gonality tree with the list of regular polygons incident to its representative vertex. On a
       * certified tiling every vertex surround is well-formed, so no fallible variant is needed.
       */
+    @deprecated(
+      "Built on the deprecated heuristic uniformityTree (ADR-0019); use " +
+        "TilingDelaney.delaneyFaceClasses / delaneyClassification for the exact gonality data",
+      "0.3.0"
+    )
+    @nowarn("cat=deprecation")
     def gonalityTreesWithPolygons: List[(List[RegularPolygon], Tree[VertexId])] =
       gonalityTrees.map: tree =>
         (tiling.regularPolygonsUnsafeFrom(tree.value), tree)

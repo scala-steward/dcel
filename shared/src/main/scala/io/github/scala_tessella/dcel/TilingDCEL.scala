@@ -9,6 +9,8 @@ import io.github.scala_tessella.dcel.geometry.{AngleDegree, BigPoint, RegularPol
 import io.github.scala_tessella.dcel.structure.{Face, FaceId, HalfEdge, Vertex, VertexId}
 import io.github.scala_tessella.ring_seq.RingSeq.startAt
 
+import scala.annotation.nowarn
+
 /** An edge-to-edge tessellation of unit-side polygons, modelled as a Doubly Connected Edge List (DCEL): each
   * edge is represented by two oppositely oriented half-edges, and each half-edge knows its origin vertex,
   * incident face, twin, predecessor and successor. The tiling has exactly one unbounded `outerFace`; all
@@ -196,6 +198,12 @@ final case class TilingDCEL private (
   /** Compressed uniformity tree of the tiling: leaves are groups of vertex ids that share the same local
     * surround signature, branches reflect the equivalence-class hierarchy.
     */
+  @deprecated(
+    "Patch-relative heuristic with documented incorrect results (ADR-0019); use " +
+      "TilingDelaney.delaneyVertexClasses for the exact vertex classes or exactUniformity for the count",
+    "0.3.0"
+  )
+  @nowarn("cat=deprecation")
   def uniformityTree: Tree[List[VertexId]] =
     this.uniformityTreeUncompressed().compress:
       _ ::: _

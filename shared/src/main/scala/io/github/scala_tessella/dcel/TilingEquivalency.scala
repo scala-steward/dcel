@@ -7,6 +7,11 @@ import io.github.scala_tessella.ring_seq.RingSeq.bracelet
 
 import scala.Ordering.Implicits.*
 
+/** Structural comparison of FINITE PATCHES: deep copies, structural/reflectional traversal equivalence, and
+  * the boundary-signature grouping. These compare concrete patches as built; for the identity of the PERIODIC
+  * TILING a patch samples — equality up to isomorphism, independent of the patch cut — use the minimal-symbol
+  * `canonicalKey` from [[TilingDelaney.delaneyClassification]].
+  */
 object TilingEquivalency:
 
   /** Groups elements from the input list into classes of equivalency. We are using a (more performant)
