@@ -17,8 +17,9 @@ import scala.collection.mutable
   * [[delaney.DelaneySymbols.classifyTorusMap]]. The minimal symbol divides out whatever extra symmetry the
   * chosen cell hid, so the result does not depend on which fundamental domain the lattice detector anchored.
   *
-  * Errors are reported as messages for now (prototype); wrapping them into the [[TilingError]] ADT (ADR-0004)
-  * is a follow-up.
+  * Failures surface as [[PeriodicityError]] (ADR-0004): a patch with no detectable lattice, a candidate
+  * period that is not a genuine symmetry, or a patch too small to cover a fundamental domain has no exact
+  * answer, and says so instead of returning a number.
   */
 object TilingDelaney:
 
@@ -41,10 +42,13 @@ object TilingDelaney:
       * recognisably periodic or the quotient is inconsistent (a wrong period, or a patch not covering a full
       * fundamental domain with margin).
       */
-    private[dcel] def torusChamberMap: Either[String, Array[Array[Int]]] =
+    private[dcel] def torusChamberMap(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Either[String, Array[Array[Int]]] =
       if tiling.vertices.isEmpty then Left("Empty tiling: nothing to quotient")
       else
-        tiling.translationLattice() match
+        tiling.translationLattice(minOverlapFraction, maxDefectFraction) match
           case None         => Left("No translation lattice detected: the patch is not recognisably periodic")
           case Some((v, w)) =>
             val det    = v.cross(w)
@@ -146,12 +150,26 @@ object TilingDelaney:
       * symbol of its torus quotient: uniformity, gonality, vertex configurations, canonical key and orbifold
       * signature — all under the FULL symmetry group of the infinite tiling.
       */
-    def delaneyClassification: Either[String, DelaneyClassification] =
-      tiling.torusChamberMap.flatMap(classifyTorusMap)
+    def delaneyClassification(
+        minOverlapFraction: Double = 0.25,
+        maxDefectFraction: Double = 0.1
+    ): Either[TilingError, DelaneyClassification] =
+      def attempt(defectFraction: Double): Either[TilingError, DelaneyClassification] =
+        for
+          op             <-
+            tiling.torusChamberMap(minOverlapFraction, defectFraction).left.map(PeriodicityError(_))
+          classification <- classifyTorusMap(op).left.map(PeriodicityError(_))
+        yield classification
+      // Strict period validation first: on a weld-free patch a tolerantly-validated sublattice false
+      // period can reach the quotient and fail its guards, where strict validation finds the genuine
+      // period. The tolerant fallback keeps patches with welded-defect vertices classifiable.
+      attempt(0.0) match
+        case Left(_) if maxDefectFraction > 0.0 => attempt(maxDefectFraction)
+        case outcome                            => outcome
 
     /** The exact uniformity (number of vertex transitivity classes) of the periodic tiling this patch
       * samples. Unlike [[TilingDCEL.uniformityTree]] — a patch-relative refinement — this is the definitional
       * quantity of the infinite tiling, independent of patch size.
       */
-    def exactUniformity: Either[String, Int] =
-      tiling.delaneyClassification.map(_.uniformity)
+    def exactUniformity: Either[TilingError, Int] =
+      tiling.delaneyClassification().map(_.uniformity)

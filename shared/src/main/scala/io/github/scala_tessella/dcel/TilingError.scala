@@ -13,6 +13,8 @@ package io.github.scala_tessella.dcel
   *     close to a simple polygon.
   *   - [[SpatialError]] — coordinates conflict: two vertices share a position, an edge is not unit length, or
   *     two edges properly intersect.
+  *   - [[PeriodicityError]] — the patch is not recognisably periodic, or its lattice quotient is
+  *     inconsistent; the Delaney–Dress pipeline ([[TilingDelaney]], ADR-0019) has no exact answer for it.
   *   - [[NotFoundError]] — a lookup by `VertexId` or `FaceId` matched no entity in the tiling.
   *
   * All variants carry a human-readable [[message]]; `NotFoundError` additionally carries the queried entity
@@ -59,6 +61,14 @@ case class GeometryError(message: String) extends TilingError
   */
 case class SpatialError(message: String) extends TilingError
 
+/** The patch has no detectable translation lattice, or its lattice quotient is inconsistent (a candidate
+  * period that is not a genuine symmetry, or a patch too small to cover a fundamental domain). Surfaced by
+  * the Delaney–Dress pipeline ([[TilingDelaney]]): exact uniformity is a property of the periodic tiling a
+  * patch samples, so a patch that cannot be recognised as periodic has no exact answer — this error is that
+  * honest outcome (ADR-0019).
+  */
+case class PeriodicityError(message: String) extends TilingError
+
 /** A lookup by `VertexId` or `FaceId` did not match any entity in the tiling. Carries the queried `entity`
   * label (e.g. `"Vertex"`) and the `id` string for structured matching.
   */
@@ -70,11 +80,12 @@ case class NotFoundError(entity: String, id: String) extends TilingError:
   * and does not fit the single-string factory shape used by [[TilingError.combineErrors]].
   */
 enum ErrorCategory(val label: String, val build: String => TilingError):
-  case Validation extends ErrorCategory("validation", ValidationError(_))
-  case Incomplete extends ErrorCategory("completeness", IncompleteError(_))
-  case Topology   extends ErrorCategory("topology", TopologyError(_))
-  case Geometry   extends ErrorCategory("geometry", GeometryError(_))
-  case Spatial    extends ErrorCategory("spatial", SpatialError(_))
+  case Validation  extends ErrorCategory("validation", ValidationError(_))
+  case Incomplete  extends ErrorCategory("completeness", IncompleteError(_))
+  case Topology    extends ErrorCategory("topology", TopologyError(_))
+  case Geometry    extends ErrorCategory("geometry", GeometryError(_))
+  case Spatial     extends ErrorCategory("spatial", SpatialError(_))
+  case Periodicity extends ErrorCategory("periodicity", PeriodicityError(_))
 
 object TilingError:
 
