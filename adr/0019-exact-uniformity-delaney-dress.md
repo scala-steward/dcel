@@ -1,6 +1,6 @@
 # ADR-0019: Exact uniformity via a ported Delaney–Dress symbol subset
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-14
 
 ## Context and problem statement
